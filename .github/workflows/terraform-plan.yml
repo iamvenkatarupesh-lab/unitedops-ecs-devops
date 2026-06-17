@@ -1,0 +1,71 @@
+name: Terraform Plan
+
+on:
+  pull_request:
+    paths:
+      - "infra/terraform/**"
+      - ".github/workflows/terraform-plan.yml"
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
+jobs:
+  plan:
+    name: Terraform Plan Against Remote State
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: infra/terraform/dev
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.4
+
+      - name: Create backend config
+        run: |
+          cat > backend.hcl <<EOF
+          bucket         = "unitedops-terraform-state-${AWS_ACCOUNT_ID}"
+          key            = "unitedops/dev/terraform.tfstate"
+          region         = "${AWS_REGION}"
+          dynamodb_table = "unitedops-terraform-locks"
+          encrypt        = true
+          EOF
+
+      - name: Create Terraform variables
+        run: |
+          cat > terraform.auto.tfvars <<EOF
+          aws_region = "${AWS_REGION}"
+          project_name = "unitedops"
+          environment = "dev"
+          flight_service_image = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unitedops-flight-service:latest"
+          booking_service_image = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unitedops-booking-service:latest"
+          checkin_service_image = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unitedops-checkin-service:latest"
+          notification_service_image = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unitedops-notification-service:latest"
+          EOF
+
+      - name: Terraform format check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init
+        run: terraform init -backend-config=backend.hcl
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        run: terraform plan -no-color

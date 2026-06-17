@@ -1,0 +1,44 @@
+name: Terraform Validate
+
+on:
+  pull_request:
+    paths:
+      - "infra/terraform/**"
+      - ".github/workflows/terraform-validate.yml"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Terraform Format And Validate
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: infra/terraform/dev
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.4
+
+      - name: Terraform format check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init
+        run: terraform init -backend=false
+
+      - name: Create validation tfvars
+        run: |
+          cat > validation.auto.tfvars <<EOF
+          flight_service_image = "111111111111.dkr.ecr.us-east-1.amazonaws.com/unitedops-flight-service:latest"
+          booking_service_image = "111111111111.dkr.ecr.us-east-1.amazonaws.com/unitedops-booking-service:latest"
+          checkin_service_image = "111111111111.dkr.ecr.us-east-1.amazonaws.com/unitedops-checkin-service:latest"
+          notification_service_image = "111111111111.dkr.ecr.us-east-1.amazonaws.com/unitedops-notification-service:latest"
+          EOF
+
+      - name: Terraform validate
+        run: terraform validate

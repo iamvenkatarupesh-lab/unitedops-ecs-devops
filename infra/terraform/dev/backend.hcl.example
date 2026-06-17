@@ -1,0 +1,5 @@
+bucket         = "unitedops-terraform-state-YOUR_ACCOUNT_ID"
+key            = "unitedops/dev/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "unitedops-terraform-locks"
+encrypt        = true
