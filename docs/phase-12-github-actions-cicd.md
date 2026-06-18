@@ -31,11 +31,15 @@ Runs Terraform format and validate checks. It does not apply Terraform.
 
 Runs Terraform plan against the shared S3 remote state backend. It does not apply Terraform.
 
+### `terraform-apply.yml`
+
+Runs Terraform apply manually through `workflow_dispatch`. It requires typing `apply`, creates a saved Terraform plan, and applies that exact plan.
+
 ## Why Terraform Apply Is Not Automated Yet
 
-The project now uses remote Terraform state, so GitHub Actions can safely run `terraform plan`.
+The project now uses remote Terraform state, so GitHub Actions can safely run `terraform plan` and manually triggered `terraform apply`.
 
-`terraform apply` is still kept manual for now because this is a learning project and manual approval is safer while infrastructure changes are still being reviewed step by step.
+`terraform apply` is still not triggered automatically on push because manual approval is safer while infrastructure changes are reviewed step by step.
 
 ## Required GitHub Secrets
 
@@ -52,4 +56,4 @@ Use `us-east-1` for `AWS_REGION`.
 
 You can say:
 
-> I implemented GitHub Actions workflows that build Docker images for `linux/amd64`, push them to Amazon ECR, force ECS services to redeploy, and run Terraform plan against S3 remote state with DynamoDB locking.
+> I implemented GitHub Actions workflows that build Docker images for `linux/amd64`, push them to Amazon ECR, force ECS services to redeploy, run Terraform plan against S3 remote state with DynamoDB locking, and support manually confirmed Terraform apply.
