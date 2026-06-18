@@ -35,7 +35,10 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.15.4
-
+      
+      
+      - name: Terraform format check
+        run: terraform fmt -check -recursive
       - name: Create backend config
         run: |
           cat > backend.hcl <<EOF
@@ -57,9 +60,6 @@ jobs:
           checkin_service_image = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unitedops-checkin-service:latest"
           notification_service_image = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unitedops-notification-service:latest"
           EOF
-
-      - name: Terraform format check
-        run: terraform fmt -check -recursive
 
       - name: Terraform init
         run: terraform init -backend-config=backend.hcl
