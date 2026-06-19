@@ -1,6 +1,7 @@
 aws_region           = "us-east-1"
 project_name         = "unitedops"
 environment          = "dev"
+frontend_image       = "YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/unitedops-frontend:latest"
 flight_service_image = "YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/unitedops-flight-service:latest"
 booking_service_image = "YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/unitedops-booking-service:latest"
 checkin_service_image = "YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/unitedops-checkin-service:latest"

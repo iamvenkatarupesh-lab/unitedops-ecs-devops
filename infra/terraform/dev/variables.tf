@@ -16,6 +16,11 @@ variable "environment" {
   default     = "dev"
 }
 
+variable "frontend_image" {
+  description = "Full ECR image URI for the frontend."
+  type        = string
+}
+
 variable "flight_service_image" {
   description = "Full ECR image URI for the flight service."
   type        = string
@@ -56,6 +61,30 @@ variable "backend_service_max_capacity" {
 
 variable "backend_service_cpu_target" {
   description = "Average CPU utilization target percentage for ECS autoscaling."
+  type        = number
+  default     = 60
+}
+
+variable "frontend_service_desired_count" {
+  description = "Number of frontend tasks to run."
+  type        = number
+  default     = 1
+}
+
+variable "frontend_service_min_capacity" {
+  description = "Minimum ECS task count for the frontend service."
+  type        = number
+  default     = 1
+}
+
+variable "frontend_service_max_capacity" {
+  description = "Maximum ECS task count for the frontend service."
+  type        = number
+  default     = 2
+}
+
+variable "frontend_service_cpu_target" {
+  description = "Average CPU utilization target percentage for frontend autoscaling."
   type        = number
   default     = 60
 }

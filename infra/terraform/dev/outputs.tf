@@ -8,6 +8,11 @@ output "flight_service_url" {
   value       = "http://${aws_lb.app.dns_name}"
 }
 
+output "frontend_url" {
+  description = "URL for the frontend through the application load balancer."
+  value       = "http://${aws_lb.app.dns_name}"
+}
+
 output "ecs_cluster_name" {
   description = "Name of the ECS cluster."
   value       = aws_ecs_cluster.main.name
@@ -16,6 +21,11 @@ output "ecs_cluster_name" {
 output "flight_service_name" {
   description = "Name of the ECS service."
   value       = aws_ecs_service.backend["flight"].name
+}
+
+output "frontend_service_name" {
+  description = "Name of the frontend ECS service."
+  value       = aws_ecs_service.frontend.name
 }
 
 output "backend_service_names" {

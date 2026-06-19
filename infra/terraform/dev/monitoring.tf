@@ -64,6 +64,66 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_targets" {
   tags = local.common_tags
 }
 
+resource "aws_cloudwatch_metric_alarm" "frontend_cpu_high" {
+  alarm_name          = "${local.name_prefix}-frontend-ecs-cpu-high"
+  alarm_description   = "ECS frontend service average CPU is above 80 percent."
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 80
+  treat_missing_data  = "notBreaching"
+
+  dimensions = {
+    ClusterName = aws_ecs_cluster.main.name
+    ServiceName = aws_ecs_service.frontend.name
+  }
+
+  tags = local.common_tags
+}
+
+resource "aws_cloudwatch_metric_alarm" "frontend_memory_high" {
+  alarm_name          = "${local.name_prefix}-frontend-ecs-memory-high"
+  alarm_description   = "ECS frontend service average memory is above 80 percent."
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "MemoryUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 80
+  treat_missing_data  = "notBreaching"
+
+  dimensions = {
+    ClusterName = aws_ecs_cluster.main.name
+    ServiceName = aws_ecs_service.frontend.name
+  }
+
+  tags = local.common_tags
+}
+
+resource "aws_cloudwatch_metric_alarm" "frontend_unhealthy_targets" {
+  alarm_name          = "${local.name_prefix}-frontend-alb-unhealthy-targets"
+  alarm_description   = "ALB target group for the frontend has unhealthy targets."
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "UnHealthyHostCount"
+  namespace           = "AWS/ApplicationELB"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  dimensions = {
+    LoadBalancer = aws_lb.app.arn_suffix
+    TargetGroup  = aws_lb_target_group.frontend.arn_suffix
+  }
+
+  tags = local.common_tags
+}
+
 resource "aws_cloudwatch_metric_alarm" "rds_cpu_high" {
   alarm_name          = "${local.name_prefix}-rds-cpu-high"
   alarm_description   = "RDS PostgreSQL average CPU is above 80 percent."

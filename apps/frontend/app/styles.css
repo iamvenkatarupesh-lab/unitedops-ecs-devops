@@ -86,7 +86,8 @@ h1 {
   overflow-wrap: anywhere;
 }
 
-.service a {
+.service a,
+.method {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -98,6 +99,11 @@ h1 {
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
+}
+
+.method {
+  background: #e7edf3;
+  color: #33445c;
 }
 
 @media (max-width: 760px) {

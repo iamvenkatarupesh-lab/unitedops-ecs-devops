@@ -34,6 +34,7 @@ jobs:
       - name: Create validation tfvars
         run: |
           cat > validation.auto.tfvars <<EOF
+          frontend_image = "111111111111.dkr.ecr.us-east-1.amazonaws.com/unitedops-frontend:latest"
           flight_service_image = "111111111111.dkr.ecr.us-east-1.amazonaws.com/unitedops-flight-service:latest"
           booking_service_image = "111111111111.dkr.ecr.us-east-1.amazonaws.com/unitedops-booking-service:latest"
           checkin_service_image = "111111111111.dkr.ecr.us-east-1.amazonaws.com/unitedops-checkin-service:latest"

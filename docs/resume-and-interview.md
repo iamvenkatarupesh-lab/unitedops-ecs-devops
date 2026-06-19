@@ -4,16 +4,16 @@
 
 **UnitedOps ECS DevOps Platform** | AWS, ECS Fargate, Terraform, Docker, GitHub Actions, RDS, CloudWatch
 
-- Built and deployed four containerized Node.js/TypeScript microservices on Amazon ECS Fargate, using an Application Load Balancer with path-based routing and health checks.
+- Built and deployed a containerized Next.js frontend and four Node.js/TypeScript microservices on Amazon ECS Fargate, using an Application Load Balancer with path-based routing and health checks.
 - Provisioned VPC networking, ECS, ALB, IAM, RDS PostgreSQL, Secrets Manager, monitoring, and autoscaling with Terraform; stored encrypted remote state in S3 with DynamoDB locking.
 - Automated Docker builds, ECR pushes, rolling ECS deployments, Terraform validation, remote-state plans, and confirmation-gated applies with GitHub Actions.
-- Implemented CloudWatch logging and 14 infrastructure alarms across ECS, ALB, and RDS, plus target-tracking scaling from one to two tasks per service at 60% CPU.
+- Implemented CloudWatch logging and 17 infrastructure alarms across ECS, ALB, and RDS, plus target-tracking scaling from one to two tasks per service at 60% CPU.
 
 Only use metrics you can explain and reproduce. The last bullet is accurate for the implemented development environment, but it should not be presented as production experience.
 
 ## 60-Second Project Explanation
 
-“I built UnitedOps to learn the complete delivery and operations lifecycle on ECS after previously using EKS. It contains four simple airline APIs packaged as Docker images. GitHub Actions builds Linux AMD64 images, pushes them to ECR, and triggers rolling deployments to ECS Fargate. An Application Load Balancer uses path-based rules to route traffic to separate ECS services and target groups. The services use RDS PostgreSQL, with the database URL stored in Secrets Manager and injected at runtime. I provisioned the environment with Terraform, moved its state to encrypted S3 with DynamoDB locking, and added separate validate, plan, and manually approved apply workflows. For operations, I added CloudWatch logs and alarms plus CPU target-tracking autoscaling. I validated the application endpoints, running task counts, database persistence, logs, alarms, and scaling policies.”
+“I built UnitedOps to learn the complete delivery and operations lifecycle on ECS after previously using EKS. It contains a Next.js frontend and four simple airline APIs packaged as Docker images. GitHub Actions builds Linux AMD64 images, pushes them to ECR, and triggers rolling deployments to ECS Fargate. An Application Load Balancer sends its default route to the frontend and uses path-based rules to route API traffic to separate ECS services and target groups. The services use RDS PostgreSQL, with the database URL stored in Secrets Manager and injected at runtime. I provisioned the environment with Terraform, moved its state to encrypted S3 with DynamoDB locking, and added separate validate, plan, and manually approved apply workflows. For operations, I added CloudWatch logs and alarms plus CPU target-tracking autoscaling. I validated the application endpoints, running task counts, database persistence, logs, alarms, and scaling policies.”
 
 ## How to Explain the Architecture
 

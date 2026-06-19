@@ -1,8 +1,24 @@
 const services = [
-  { name: "Flight Service", url: process.env.NEXT_PUBLIC_FLIGHT_API_URL ?? "http://localhost:4001" },
-  { name: "Booking Service", url: process.env.NEXT_PUBLIC_BOOKING_API_URL ?? "http://localhost:4002" },
-  { name: "Check-In Service", url: process.env.NEXT_PUBLIC_CHECKIN_API_URL ?? "http://localhost:4003" },
-  { name: "Notification Service", url: process.env.NEXT_PUBLIC_NOTIFICATION_API_URL ?? "http://localhost:4004" }
+  {
+    name: "Flight Service",
+    url: `${process.env.NEXT_PUBLIC_FLIGHT_API_URL ?? ""}/flights`,
+    method: "GET"
+  },
+  {
+    name: "Booking Service",
+    url: `${process.env.NEXT_PUBLIC_BOOKING_API_URL ?? ""}/bookings`,
+    method: "GET"
+  },
+  {
+    name: "Check-In Service",
+    url: `${process.env.NEXT_PUBLIC_CHECKIN_API_URL ?? ""}/checkins`,
+    method: "POST"
+  },
+  {
+    name: "Notification Service",
+    url: `${process.env.NEXT_PUBLIC_NOTIFICATION_API_URL ?? ""}/notifications`,
+    method: "POST"
+  }
 ];
 
 export default function Home() {
@@ -21,11 +37,15 @@ export default function Home() {
           <article className="service" key={service.name}>
             <div>
               <h2>{service.name}</h2>
-              <p>{service.url}</p>
+              <p>{service.method} {service.url}</p>
             </div>
-            <a href={`${service.url}/health`} target="_blank" rel="noreferrer">
-              Health
-            </a>
+            {service.method === "GET" ? (
+              <a href={service.url} target="_blank" rel="noreferrer">
+                Open
+              </a>
+            ) : (
+              <span className="method">API</span>
+            )}
           </article>
         ))}
       </section>

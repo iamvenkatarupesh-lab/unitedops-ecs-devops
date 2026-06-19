@@ -62,6 +62,7 @@ jobs:
           aws_region = "${AWS_REGION}"
           project_name = "unitedops"
           environment = "dev"
+          frontend_image = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unitedops-frontend:latest"
           flight_service_image = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unitedops-flight-service:latest"
           booking_service_image = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unitedops-booking-service:latest"
           checkin_service_image = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unitedops-checkin-service:latest"

@@ -1,6 +1,6 @@
 # UnitedOps: ECS DevOps Platform
 
-UnitedOps is an airline operations application used to demonstrate an end-to-end AWS DevOps workflow. Five TypeScript applications are containerized with Docker and stored in Amazon ECR; the four backend APIs run as independent services on Amazon ECS Fargate. Terraform provisions the infrastructure, GitHub Actions automates validation and deployment, and CloudWatch provides logs, metrics, alarms, and scaling signals.
+UnitedOps is an airline operations application used to demonstrate an end-to-end AWS DevOps workflow. A Next.js frontend and four TypeScript APIs are containerized with Docker, stored in Amazon ECR, and run as independent services on Amazon ECS Fargate. Terraform provisions the infrastructure, GitHub Actions automates validation and deployment, and CloudWatch provides logs, metrics, alarms, and scaling signals.
 
 The application code is intentionally small. The project focuses on the operational path from a source-code change to a monitored workload running in AWS.
 
@@ -9,6 +9,7 @@ The application code is intentionally small. The project focuses on the operatio
 ```mermaid
 flowchart LR
     User["User / API client"] --> ALB["Application Load Balancer"]
+    ALB -->|"default route /"| Frontend["Frontend ECS service"]
     ALB -->|"/health, /flights"| Flight["Flight ECS service"]
     ALB -->|"/bookings"| Booking["Booking ECS service"]
     ALB -->|"/checkins"| Checkin["Check-in ECS service"]
@@ -22,10 +23,12 @@ flowchart LR
     Secrets -. "DATABASE_URL" .-> Checkin
     Secrets -. "DATABASE_URL" .-> Notification
     ECR["Amazon ECR"] --> Flight
+    ECR --> Frontend
     ECR --> Booking
     ECR --> Checkin
     ECR --> Notification
-    Logs["CloudWatch Logs and alarms"] --- Flight
+    Logs["CloudWatch Logs and alarms"] --- Frontend
+    Logs --- Flight
     Logs --- Booking
     Logs --- Checkin
     Logs --- Notification
@@ -39,7 +42,7 @@ GitHub Actions builds Linux AMD64 images, pushes them to ECR, and requests rolli
 | --- | --- | --- |
 | Containers | Docker images for the frontend and four APIs | Creates the same deployable unit for local and cloud environments |
 | Registry | Separate ECR repository per application | Stores versioned images near the ECS runtime |
-| Compute | Four ECS services on serverless Fargate tasks | Runs containers without managing EC2 worker nodes |
+| Compute | Five ECS services on serverless Fargate tasks | Runs containers without managing EC2 worker nodes |
 | Traffic | Public ALB with path-based target groups and health checks | Provides one entry point and routes requests to healthy services |
 | Data | PostgreSQL on Amazon RDS | Moves database maintenance, backups, and availability concerns to a managed service |
 | Secrets | `DATABASE_URL` in Secrets Manager, injected at task startup | Keeps credentials out of images, source code, and task definitions |
@@ -50,8 +53,8 @@ GitHub Actions builds Linux AMD64 images, pushes them to ECR, and requests rolli
 
 ## Request Flow
 
-1. A client sends a request to the ALB DNS name.
-2. The listener selects a target group from the URL path.
+1. A client sends a request to the ALB DNS name; `/` uses the default frontend target group.
+2. API paths match higher-priority listener rules and select their backend target groups.
 3. The target group forwards the request only to healthy Fargate task IPs.
 4. ECS maintains the desired task count and replaces failed tasks.
 5. The task receives `DATABASE_URL` from Secrets Manager and queries RDS.
@@ -139,7 +142,7 @@ The workflows require GitHub repository secrets for `AWS_ACCESS_KEY_ID`, `AWS_SE
 
 - ALB health checks remove unhealthy targets from traffic.
 - ECS reconciles desired and running task counts.
-- Target-tracking policies scale each backend between one and two tasks at 60% CPU.
+- Target-tracking policies scale each service between one and two tasks at 60% CPU.
 - CloudWatch alarms watch ECS CPU/memory, unhealthy ALB targets, and RDS CPU/free storage.
 - Security groups restrict database traffic to application tasks.
 - ECS execution roles grant tasks access to image pulls, logs, and the required secret.

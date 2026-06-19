@@ -25,7 +25,7 @@ jobs:
         service:
           - app: frontend
             ecr: unitedops-frontend
-            ecs: ""
+            ecs: unitedops-dev-frontend
           - app: flight-service
             ecr: unitedops-flight-service
             ecs: unitedops-dev-flight-service
