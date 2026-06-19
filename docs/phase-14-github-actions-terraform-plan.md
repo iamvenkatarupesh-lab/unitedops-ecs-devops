@@ -29,6 +29,8 @@ This workflow still does not run `terraform apply`. It only checks what Terrafor
 - `AWS_ACCOUNT_ID`
 - `AWS_REGION`
 
+> **Phase 18 update:** the access-key secrets above were part of the initial learning setup. The plan workflow now assumes an AWS role through GitHub OIDC.
+
 ## Interview Explanation
 
 You can say:

@@ -48,7 +48,7 @@ GitHub Actions builds Linux AMD64 images, pushes them to ECR, and requests rolli
 | Secrets | `DATABASE_URL` in Secrets Manager, injected at task startup | Keeps credentials out of images, source code, and task definitions |
 | Infrastructure | Terraform for networking, ECS, ALB, RDS, IAM, monitoring, and scaling | Makes the environment repeatable and reviewable |
 | State | Encrypted S3 backend with DynamoDB locking | Enables shared state and prevents concurrent Terraform writes |
-| Delivery | GitHub Actions for validation, plans, manual applies, and service deployments | Adds repeatable checks and controlled automation |
+| Delivery | GitHub Actions with AWS OIDC for validation, plans, manual applies, and service deployments | Adds repeatable checks and temporary cloud credentials |
 | Operations | CloudWatch log groups, CPU/memory alarms, ALB/RDS alarms, and ECS target tracking | Supports troubleshooting, alerting, and capacity changes |
 
 ## Request Flow
@@ -136,7 +136,7 @@ curl "$BASE_URL/bookings"
 - **Terraform Apply:** requires a manual dispatch and the exact confirmation `apply`, saves a plan, then applies that plan.
 - **Deploy Services:** builds each application for `linux/amd64`, pushes images to ECR, starts rolling backend deployments, and waits for ECS stability.
 
-The workflows require GitHub repository secrets for `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_ACCOUNT_ID`, and `AWS_REGION`. A production improvement would replace long-lived access keys with GitHub OpenID Connect and a short-lived IAM role.
+The AWS-enabled workflows use GitHub OpenID Connect to assume a repository-scoped IAM role and receive short-lived credentials. Only `AWS_ACCOUNT_ID` and `AWS_REGION` are configured as repository values; no AWS access key is stored in GitHub.
 
 ## Reliability and Security
 
@@ -146,6 +146,7 @@ The workflows require GitHub repository secrets for `AWS_ACCESS_KEY_ID`, `AWS_SE
 - CloudWatch alarms watch ECS CPU/memory, unhealthy ALB targets, and RDS CPU/free storage.
 - Security groups restrict database traffic to application tasks.
 - ECS execution roles grant tasks access to image pulls, logs, and the required secret.
+- GitHub Actions can assume its deployment role only from this repository's `main` branch or pull-request context.
 - No credentials, `.env` files, Terraform state, or local backend configuration belong in Git.
 
 ## Cost and Teardown

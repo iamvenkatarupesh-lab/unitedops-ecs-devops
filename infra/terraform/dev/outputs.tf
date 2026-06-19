@@ -44,3 +44,8 @@ output "database_secret_name" {
   description = "Secrets Manager secret name containing DATABASE_URL."
   value       = aws_secretsmanager_secret.database_url.name
 }
+
+output "github_actions_role_arn" {
+  description = "IAM role assumed by GitHub Actions through OIDC."
+  value       = aws_iam_role.github_actions.arn
+}

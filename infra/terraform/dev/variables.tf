@@ -16,6 +16,12 @@ variable "environment" {
   default     = "dev"
 }
 
+variable "github_repository" {
+  description = "GitHub repository allowed to assume the GitHub Actions IAM role."
+  type        = string
+  default     = "iamvenkatarupesh-lab/unitedops-ecs-devops"
+}
+
 variable "frontend_image" {
   description = "Full ECR image URI for the frontend."
   type        = string

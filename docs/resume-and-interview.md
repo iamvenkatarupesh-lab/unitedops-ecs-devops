@@ -6,7 +6,7 @@
 
 - Built and deployed a containerized Next.js frontend and four Node.js/TypeScript microservices on Amazon ECS Fargate, using an Application Load Balancer with path-based routing and health checks.
 - Provisioned VPC networking, ECS, ALB, IAM, RDS PostgreSQL, Secrets Manager, monitoring, and autoscaling with Terraform; stored encrypted remote state in S3 with DynamoDB locking.
-- Automated Docker builds, ECR pushes, rolling ECS deployments, Terraform validation, remote-state plans, and confirmation-gated applies with GitHub Actions.
+- Automated Docker builds, ECR pushes, rolling ECS deployments, Terraform validation, remote-state plans, and confirmation-gated applies with GitHub Actions using short-lived AWS OIDC credentials.
 - Implemented CloudWatch logging and 17 infrastructure alarms across ECS, ALB, and RDS, plus target-tracking scaling from one to two tasks per service at 60% CPU.
 
 Only use metrics you can explain and reproduce. The last bullet is accurate for the implemented development environment, but it should not be presented as production experience.
@@ -62,9 +62,9 @@ Infrastructure changes have a larger blast radius than a normal application buil
 
 An updated `latest` tag does not provide immutable release identity or reliable rollback. A production pipeline should tag each image with the Git commit SHA, update the task definition to that exact tag or digest, and retain previous task definition revisions.
 
-### Why are long-lived GitHub AWS keys a limitation?
+### Why use GitHub OIDC instead of AWS access-key secrets?
 
-They require storage and rotation. A production improvement is GitHub Actions OIDC: GitHub receives a short-lived token and assumes a narrowly scoped IAM role without storing an AWS secret access key.
+Long-lived keys require secure storage and rotation. With OIDC, GitHub presents a signed identity token and AWS STS issues temporary role credentials. The role trust policy also limits assumption to the expected repository and workflow contexts.
 
 ## Troubleshooting Stories
 
@@ -101,7 +101,7 @@ Use immutable image tags, explicit task definition revisions, deployment circuit
 Target tracking asks Application Auto Scaling to increase the ECS service desired count, up to two in this development environment. It scales in after utilization falls and cooldown conditions are met.
 
 **What is still not production-ready?**  
-The environment uses HTTP, a small single development database, long-lived CI credentials, mutable image tags, and a low scaling ceiling. Production would add HTTPS with ACM, Route 53, multi-AZ RDS, backups and recovery tests, OIDC, immutable releases, least-privilege review, WAF, stronger network isolation, and load testing.
+The environment uses HTTP, a small single development database, mutable image tags, and a low scaling ceiling. Production would add HTTPS with ACM, Route 53, multi-AZ RDS, backups and recovery tests, immutable releases, further least-privilege review, WAF, stronger network isolation, and load testing.
 
 ## Honest Interview Language
 

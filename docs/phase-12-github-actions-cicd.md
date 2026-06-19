@@ -50,6 +50,8 @@ Add these repository secrets:
 - `AWS_ACCOUNT_ID`
 - `AWS_REGION`
 
+> **Phase 18 update:** the access-key secrets above were part of the initial learning setup. The workflows now use GitHub OIDC and temporary AWS role credentials; the two permanent-key secrets can be deleted.
+
 Use `us-east-1` for `AWS_REGION`.
 
 ## Interview Explanation
